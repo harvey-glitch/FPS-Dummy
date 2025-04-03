@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Collections;
 using UnityEngine;
 
 public class Projectile : MonoBehaviour
@@ -44,7 +42,30 @@ public class Projectile : MonoBehaviour
 
     void ReturnToPool()
     {
-        // Return the current projectile to the object pool
         PoolManager.instance.ReturnObject("Projectile", gameObject);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Enemy"))
+        {
+            HealthManager health = other.GetComponent<HealthManager>();
+
+            if (health != null)
+            {
+                health.TakeDamage(10);
+            }
+        }
+
+        SpawnParticle();
+    }
+    
+    private void SpawnParticle()
+    {   
+        GameObject impactParticle = PoolManager.instance.GetObject("Impact");
+        impactParticle.transform.position = transform.position;
+        impactParticle.transform.rotation = Quaternion.identity;
+
+        ReturnToPool();
     }
 }

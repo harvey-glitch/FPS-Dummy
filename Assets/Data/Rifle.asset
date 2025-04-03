@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Rifle
   m_EditorClassIdentifier: 
   damage: 10
-  firerate: 7
+  firerate: 8
   maxAmmo: 30
   reloadSpeed: 3
   pellets: 0

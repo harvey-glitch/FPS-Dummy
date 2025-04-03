@@ -17,4 +17,4 @@ MonoBehaviour:
   maxAmmo: 6
   reloadSpeed: 3
   pellets: 6
-  spreadAngle: 10
+  spreadAngle: 7

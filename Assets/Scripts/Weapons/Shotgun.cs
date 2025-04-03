@@ -7,9 +7,9 @@ public class Shotgun : Weapon
 
     public override void Fire()
     {
-        // Fire multiple pellets with some spread
         for (int i = 0; i < weaponData.pellets; i++)
         {
+            // Create random direction based on spread value
             Vector3 spreadOffset = new Vector3(
             Random.Range(-weaponData.spreadAngle, weaponData.spreadAngle),
             Random.Range(-weaponData.spreadAngle, weaponData.spreadAngle),
@@ -23,10 +23,9 @@ public class Shotgun : Weapon
             // Set each projectile position and rotation
             projectile.transform.position = firePoint.position;
             projectile.transform.rotation = firePoint.rotation * spreadRotation;
-            Debug.Log("Spawned Projectile: " + weaponData.pellets);
         }
 
-        // Reduce ammo and update UI
+        // Reduce ammo
         currentAmmo--;
 
         // Set the next fire time
