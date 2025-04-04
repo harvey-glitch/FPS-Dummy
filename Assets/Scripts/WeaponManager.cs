@@ -1,5 +1,4 @@
 using UnityEngine;
-using TMPro;
 
 public class WeaponManager : MonoBehaviour
 {
@@ -7,7 +6,7 @@ public class WeaponManager : MonoBehaviour
     [SerializeField] Transform weaponslot;
 
     // Current weapon being held by the player
-    private Weapon currentWeapon;
+    [HideInInspector] public Weapon currentWeapon;
 
     #region Singleton
     private void Awake()

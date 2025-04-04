@@ -3,20 +3,18 @@ using UnityEngine;
 
 public class DisableParticle : MonoBehaviour
 {
-    // Total time before returning to pool
-    [SerializeField] float lifeTime = 1f;
-    // The object tag used to return to the pool
-    [SerializeField] string objectTag = "";
+    [Header("PARTICLE")]
+    [SerializeField] float lifeTime = 1f; // Total time before returning to pool
+    [SerializeField] string objectTag = ""; // The object tag used to return to the pool
 
     void OnEnable()
     {
-        // Start the countdown coroutine when the object is enabled
         StartCoroutine(StartCountdown());
     }
 
+    // Method to return the projectile to pool after specified time
     IEnumerator StartCountdown()
     {
-        // Return the object to the pool for the specified lifetime
         yield return new WaitForSeconds(lifeTime);
         ReturnToPool();
     }

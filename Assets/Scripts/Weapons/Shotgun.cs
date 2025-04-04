@@ -31,6 +31,8 @@ public class Shotgun : Weapon
         // Set the next fire time
         nextFireTime = Time.time + 1f / weaponData.firerate;
 
+        PlayAudio();
+        
         // Handle reloading
         if (currentAmmo <= 0)
         {

@@ -47,14 +47,12 @@ public class Projectile : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Enemy"))
-        {
-            HealthManager health = other.GetComponent<HealthManager>();
+        if (other.transform.CompareTag("Projectiles")) return;
 
-            if (health != null)
-            {
-                health.TakeDamage(10);
-            }
+        if (other.TryGetComponent<HitBox>(out HitBox hitBox))
+        {
+            float damage = WeaponManager.instance.currentWeapon.weaponData.damage;
+            hitBox.ApplyDamage(damage);
         }
 
         SpawnParticle();

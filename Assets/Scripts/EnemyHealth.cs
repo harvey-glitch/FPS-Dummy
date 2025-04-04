@@ -2,13 +2,13 @@ using UnityEngine;
 
 public class EnemyHealth : HealthManager
 {
-    // Reference to the enemy controller class
-    Enemy m_enemy;
+    Enemy m_enemy; // Reference to the enemy script in parent object
+    Ragdoll m_ragdoll; // " " "
 
     void Awake()
     {
-        // Get enemy script component
-        m_enemy = GetComponent<Enemy>();
+        m_enemy = GetComponentInParent<Enemy>();
+        m_ragdoll = GetComponentInParent<Ragdoll>();
     }
 
     public override void TakeDamage(float damageAmount)
@@ -19,12 +19,14 @@ public class EnemyHealth : HealthManager
         // Only provoked the enemy once
         if (!m_enemy.isProvoked)
         {
-            m_enemy.OnProvoked();
+            m_enemy.InitializedEnemy();
         }
     }
 
     protected override void OnHealthDepleted()
     {
-        gameObject.SetActive(false);
+        m_ragdoll.EnableRagdoll(true);
+        m_ragdoll.ApplyRagdollForce(30.0f);
+        m_enemy.DisableEnemy();
     }
 }

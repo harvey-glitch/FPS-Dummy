@@ -18,6 +18,8 @@ public class Rifle : Weapon
         // Set the next fire time
         nextFireTime = Time.time + 1f / weaponData.firerate;
 
+        PlayAudio();
+        
         if (currentAmmo <= 0)
         {
             StartCoroutine(ReloadWeapon());

@@ -3,19 +3,19 @@ using UnityEngine;
 public class PlayerControl : MonoBehaviour
 {
     [Header("MOVEMENT")]
-    [HideInInspector] public float moveSpeed = 4.0f;
-    [SerializeField] private float sprintSpeed = 7.0f;
+    public float moveSpeed = 4.0f; // Speed at which the player moves
+    [SerializeField] private float sprintSpeed = 7.0f; // Speed when sprinting
 
-    [Header("MOVEMENT")]
-    [SerializeField] private float lookLimit = 85.0f;
-    [SerializeField] private float lookSpeed = 3.0f;
+    [Header("ROTATION")]
+    [SerializeField] private float lookLimit = 85.0f; // Max camera rotation
+    [SerializeField] private float lookSpeed = 3.0f; // How fast the camera rotation is
 
-    CharacterController m_controller;
-    Camera m_camera;
+    CharacterController m_controller; // Reference to the character controller
+    Camera m_camera; // Reference to the main camera
 
     [HideInInspector] public float currentSpeed; // Tracks the current speed of the player
 
-    float m_xRotation = 0.0f;
+    float m_xRotation = 0.0f; // Tracks the horizontal rotation of the camera
 
     private void Start()
     {

@@ -1,52 +1,30 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
 public class Enemy : MonoBehaviour
 {
-    // Flag to indicate if the AI is provoked or not
-    [HideInInspector] public bool isProvoked;
-    // The distance at which the AI can detect the target.
-    [SerializeField] float detectionRange= 10.0f;
-    // The distance within which the AI will start attacking the target.
-    [SerializeField] float attackDistance = 2.0f;
-    // A layer mask to define obstacles that could block the AI's line of sight.
-    [SerializeField] LayerMask obstacleMask;
+    enum States { idle, chase, attack } // States for AI
 
-    // Reference to the NavMeshAgent component
-    NavMeshAgent m_agent;
-    // Reference to the Animator component
-    Animator m_animator;
-    // Reference to the transform component of the target / player
-    Transform m_target;
-    // Flag to indicate whether the AI is currently in the middle of an attack.
-    bool m_isAttacking;
-    // Stores the last known position of the target
-    Vector3 m_targetLastPosition;
-    // The next time when the AI should update its chase destination.
-    float m_nextUpdateTime;
-
-    Color debugColor;
-
-    // Enumeration for different AI states: idle, chasing, and attacking.
-    enum States
-    {
-        idle, 
-        chase,
-        attack
-    }
-
-    // The current state of the AI; setting it to idle by default
-    [SerializeField] States currentState = States.idle;
+    [Header("ENEMY")]
+    [SerializeField] float detectionRange= 10.0f; // The distance AI can detect target.
+    [SerializeField] float attackDistance = 2.0f; // The distance AI can attack target.
+    [SerializeField] LayerMask obstacleMask; // A layer mask that block the AI's line of sight.
+    [HideInInspector] public bool isProvoked; // Flag to indicate if the AI is provoked or not
+    [SerializeField] States currentState = States.idle; // Tracks the current state of the AI
+    NavMeshAgent m_agent; // Reference to the NavMeshAgent component
+    Animator m_animator; // Reference to the Animator component
+    Transform m_target; // Reference to the player transform
+    bool m_isAttacking;  // Flag to indicate whether the AI is currently in the middle of an attack.
+    Vector3 m_targetLastPosition; // Stores the last known position of the target
+    float m_nextUpdateTime; // The next time when the AI should update its chase destination.
 
     void Awake()
     {
-        // Catch required components
         m_agent = GetComponent<NavMeshAgent>();
         m_animator = GetComponent<Animator>();
 
-        // Catch the target transform reference
+        // Get the player transform
         m_target = FindAnyObjectByType<PlayerControl>().transform;
     }
 
@@ -85,7 +63,7 @@ public class Enemy : MonoBehaviour
         {
             // Check if the target is visible
             if (!IsTargetObstructed())
-            OnProvoked();
+            InitializedEnemy();
         }
     }
 
@@ -176,8 +154,7 @@ public class Enemy : MonoBehaviour
         m_agent.isStopped = stopMovement;
     }
 
-    // Set to public to be accessible by healh script
-    public void OnProvoked()
+    public void InitializedEnemy()
     {
         isProvoked = true;
         ChangeState(States.chase, false);
@@ -201,6 +178,12 @@ public class Enemy : MonoBehaviour
     {
         // Check if theres an obstacle block the player
         return Physics.Raycast(transform.position, GetTargetDirection(), GetTargetDistance(), obstacleMask);
+    }
+
+    public void DisableEnemy()
+    {
+        m_agent.enabled = false;
+        this.enabled = false;
     }
     #endregion
 }
