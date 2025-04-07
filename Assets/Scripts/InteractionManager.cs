@@ -19,7 +19,7 @@ public class InteractionManager : MonoBehaviour
         
         if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, rayLength, targetLayer))
         {
-             promptText.text = "Weapon\n[E]";
+             promptText.text = hit.transform.name + "\n[E]";
 
             if (!Input.GetKeyDown(KeyCode.E)) return;
 

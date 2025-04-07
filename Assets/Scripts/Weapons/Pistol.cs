@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Rifle : Weapon
+public class Pistol : Weapon
 {
     [Header("WEAPON")]
     [SerializeField] Transform firePoint;

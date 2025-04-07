@@ -40,23 +40,23 @@ public class Enemy : MonoBehaviour
         switch (currentState)
         {
             case States.idle:
-                SearchForTarget();
+                SearchTarget();
                 break;
             case States.chase:
-                ChaseTheTarget();
+                ChaseTarget();
 
                 if (GetTargetDistance() <= attackDistance)
                     ChangeState(States.attack, true);
                 break;
             case States.attack:
-                PerformAttack();
+                AttackTarget();
                 break;
         }
 
         LookAtTheTarget();
     }
 
-    void SearchForTarget()
+    void SearchTarget()
     {
         // Check if the target is within the detection distance
         if (GetTargetDistance() <= detectionRange)
@@ -67,7 +67,7 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    void ChaseTheTarget()
+    void ChaseTarget()
     {
         // Update the destination based on interval
         if (Time.time >= m_nextUpdateTime)
@@ -82,11 +82,12 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    private void PerformAttack()
-    {
+    void AttackTarget()
+    {   
         if (!m_isAttacking)
         {
-            StartCoroutine(StartAttack());
+            m_isAttacking = true;
+            m_animator.SetTrigger("Attack");
         }
     }
 
@@ -117,27 +118,14 @@ public class Enemy : MonoBehaviour
         m_animator.SetFloat("Speed", m_agent.velocity.magnitude);
     }
 
-    private IEnumerator StartAttack()
+public void OnAttackFinished()
+{
+    if (GetTargetDistance() > attackDistance)
     {
-        // Mark as attacking
-        m_isAttacking = true;
-
-        // Trigger attack animation
-        m_animator.SetTrigger("Attack");
-
-        // Wait until the attack animation is actually playing
-        yield return new WaitUntil(() => m_animator.GetCurrentAnimatorStateInfo(0).IsName("Attack"));
-
-        // Wait until the attack animation finishes
-        yield return new WaitWhile(() => m_animator.GetCurrentAnimatorStateInfo(0).normalizedTime < 0.9f);
-
-        if (GetTargetDistance() > attackDistance)
-        {
-            ChangeState(States.chase, false);
-        }   
-        
-        m_isAttacking = false;
+        ChangeState(States.chase, false);
     }
+    m_isAttacking = false;
+}
 
     void UpdateDestination()
     {

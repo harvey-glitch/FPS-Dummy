@@ -6,10 +6,14 @@ public class WeaponPickup : Pickable
 
     public override void Interact()
     {
-        Weapon weapon = weaponPrefab.GetComponent<Weapon>();
+
+         // Instantiate the weapon prefab to create an actual object
+        GameObject weaponInstance = Instantiate(weaponPrefab, WeaponManager.instance.weaponSlot);
+        
+        Weapon weapon = weaponInstance.GetComponent<Weapon>();
         if (weapon != null)
         {
-            WeaponManager.instance.EquipWeapon(weaponPrefab, weapon.weaponData);
+            WeaponManager.instance.SetWeapon(weapon);
             Destroy(gameObject);
         }
     }

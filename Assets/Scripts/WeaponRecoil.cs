@@ -28,16 +28,17 @@ public class WeaponRecoil : MonoBehaviour
     public void ApplyRecoil()
     {
         // Only apply recoil when the user fired the weapon
-        if (!WeaponManager.instance.Fired()) return;
+        if (CanApplyRecoil())
+        {
+            // Add random rotation offset on the recoil
+            float randomRecoil = Random.Range(-recoilRotation, recoilRotation);
 
-        // Add random rotation offset on the recoil
-        float randomRecoil = Random.Range(-recoilRotation, recoilRotation);
+            Quaternion newRotation = Quaternion.Euler(-recoilRotation, randomRecoil, 0);
+            transform.localRotation = transform.localRotation *= newRotation;
 
-        Quaternion newRotation = Quaternion.Euler(-recoilRotation, randomRecoil, 0);
-        transform.localRotation = transform.localRotation *= newRotation;
-
-        // Move the weapon slightly backward
-        transform.localPosition += Vector3.back * recoilKickback;
+            // Move the weapon slightly backward
+            transform.localPosition += Vector3.back * recoilKickback;
+        }
     }
 
     public void ResetRecoil()
@@ -48,5 +49,14 @@ public class WeaponRecoil : MonoBehaviour
 
         transform.localPosition = Vector3.Lerp( 
             transform.localPosition, m_originalPos, Time.deltaTime * recoilSpeed);
+    }
+
+    private bool CanApplyRecoil()
+    {
+        if (Input.GetMouseButton(0) && WeaponManager.instance.ReadyToFire())   
+        {
+            return true;
+        }
+        return false;
     }
 }

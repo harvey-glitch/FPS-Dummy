@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2cacec7ea6679c4891eeec4d143d6f7, type: 3}
   m_Name: Shotgun
   m_EditorClassIdentifier: 
-  damage: 25
-  firerate: 3
+  damage: 10
+  firerate: 0.5
   maxAmmo: 6
   reloadSpeed: 3
   pellets: 6

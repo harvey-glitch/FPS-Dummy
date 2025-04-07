@@ -229,7 +229,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 614797ce94b0ed848ab32e2a252e002b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gunShotAudio: {fileID: 8300000, guid: 6f590191386a76042bcdb351005d037d, type: 3}
-  audioSource: {fileID: 5280485991639489411}
+  type: 0
+  gunShotAudio: {fileID: 0}
+  audioSource: {fileID: 0}
   weaponData: {fileID: 11400000, guid: 1a109cde2a2515d46aa5af05f245380c, type: 2}
   firePoint: {fileID: 8519355492227152752}

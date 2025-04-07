@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class Shotgun : Weapon
 {
+    [Header("WEAPON")]
     // Transform where the projectile are shot from
     [SerializeField] Transform firePoint;
 
@@ -25,18 +26,6 @@ public class Shotgun : Weapon
             projectile.transform.rotation = firePoint.rotation * spreadRotation;
         }
 
-        // Reduce ammo
-        currentAmmo--;
-
-        // Set the next fire time
-        nextFireTime = Time.time + 1f / weaponData.firerate;
-
-        PlayAudio();
-        
-        // Handle reloading
-        if (currentAmmo <= 0)
-        {
-            StartCoroutine(ReloadWeapon());
-        }
+        base.Fire();
     }
 }

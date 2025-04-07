@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 
 public class WeaponBob : MonoBehaviour
@@ -36,15 +37,19 @@ public class WeaponBob : MonoBehaviour
         Vector3 moveInput = InputManager.GetMoveInput().normalized;
         float speedFactor = m_player.currentSpeed / m_player.moveSpeed;
 
-        if (moveInput.magnitude > 0 && !WeaponManager.instance.Fired())
+        // Reduce the bob intensity when firing
+        float bobMultiplier = Input.GetMouseButton(0) ? 0.2f : 1.0f;
+
+        if (moveInput.magnitude > 0)
         {
             // Make the speed of the bob relative to player current speed
             m_timer += Time.deltaTime * bobSpeed * speedFactor;
 
             // Create vertical and horizontal motion using sin wave
-            float yBob = Mathf.Abs(Mathf.Sin(m_timer)) * bobAmount;
-            float xBob = Mathf.Sin(m_timer + Mathf.PI / 2) * bobOffset;
+            float yBob = Mathf.Abs(Mathf.Sin(m_timer)) * bobAmount * bobMultiplier;
+            float xBob = Mathf.Sin(m_timer + Mathf.PI / 2) * bobOffset * bobMultiplier;
 
+            // Apply the calculated bob offset
             transform.localPosition = new Vector3(
                 m_originalPos.x + xBob, m_originalPos.y + yBob, m_originalPos.z);
 
