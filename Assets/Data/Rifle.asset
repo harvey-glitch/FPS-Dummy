@@ -16,5 +16,7 @@ MonoBehaviour:
   firerate: 0.1
   maxAmmo: 30
   reloadSpeed: 3
+  recoilStrength: 0.1
+  recoilOffset: 15
   pellets: 0
   spreadAngle: 0

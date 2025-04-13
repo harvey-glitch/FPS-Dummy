@@ -10,7 +10,7 @@ public static class InputManager
         return new Vector3(xInput, 0, zInput);
     }
 
-    public static Vector2 GetMouseInput()
+    public static Vector2 GetLookInput()
     {
         float mouseX = Input.GetAxis("Mouse X");
         float mouseY = Input.GetAxis("Mouse Y");

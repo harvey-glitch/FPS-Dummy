@@ -2,17 +2,16 @@ using UnityEngine;
 
 public class Projectile : MonoBehaviour
 {
-    // Speed at which the projectile moves
-    [SerializeField] float speed;
+    [Tooltip("Speed at which the projectile moves")]
+    public float speed;
 
-    TrailRenderer m_projectileTrail;
+    private TrailRenderer _projectileTrail;
 
-    // Tracks the distance the projectile has traveled
-    float m_distanceTraveled;
+    private float _distanceTraveled;
 
     private void Start()
     {
-        m_projectileTrail = GetComponent<TrailRenderer>();
+        _projectileTrail = GetComponent<TrailRenderer>();
     }
 
     void Update()
@@ -22,27 +21,29 @@ public class Projectile : MonoBehaviour
 
     void MoveProjectile()
     {
+        // continuesy move the projectile forward
         transform.position += transform.forward * speed * Time.deltaTime;
 
-        m_distanceTraveled += speed * Time.deltaTime;
+        _distanceTraveled += speed * Time.deltaTime;
 
-        if (m_distanceTraveled >= 10)
+        // disable upon reaching specified distance
+        if (_distanceTraveled >= 10)
         {
-            ResetProjectleData();
             ReturnToPool();
         }
     }
 
     void ResetProjectleData()
     {
-        m_distanceTraveled = 0;
+        _distanceTraveled = 0;
 
-        m_projectileTrail.Clear();
+        _projectileTrail.Clear();
     }
 
     void ReturnToPool()
     {
         PoolManager.instance.ReturnObject("Projectile", gameObject);
+        ResetProjectleData();
     }
 
     private void OnTriggerEnter(Collider other)
@@ -60,10 +61,11 @@ public class Projectile : MonoBehaviour
     
     private void SpawnParticle()
     {   
+        // get the particle from the pool and set its transform
         GameObject impactParticle = PoolManager.instance.GetObject("Impact");
         impactParticle.transform.position = transform.position;
         impactParticle.transform.rotation = Quaternion.identity;
 
-        ReturnToPool();
+        ReturnToPool(); // return to pool after use
     }
 }

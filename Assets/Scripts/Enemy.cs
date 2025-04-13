@@ -25,7 +25,7 @@ public class Enemy : MonoBehaviour
         m_animator = GetComponent<Animator>();
 
         // Get the player transform
-        m_target = FindAnyObjectByType<PlayerControl>().transform;
+        m_target = FindAnyObjectByType<FPSController>().transform;
     }
 
     void Update()

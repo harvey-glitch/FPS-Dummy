@@ -1,73 +1,63 @@
-using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 
 public class WeaponBob : MonoBehaviour
 {
-    [Header("BOBBING SETTINGS")]
-    // How fast the bob is
-    [SerializeField] float bobSpeed = 8.0f;
-    // How strong the bob is
-    [SerializeField] float bobAmount = 0.05f;
-    // Horizontal offset of the bob
-    [SerializeField] float bobOffset = 0.04f;
-    // Smoothing effect of the bob
-    [SerializeField] float smoothness = 3.0f;
+    [Tooltip("How fast the bob is")]
+    public float bobSpeed = 8.0f;
 
-    Vector3 m_originalPos; // Save the original position of this object
-    Quaternion m_originalRot; // Save the original rotation of this object
+    [Tooltip("How strong the bob is")]
+    public float bobStrength = 0.05f;
 
-    PlayerControl m_player; // Reference to the player controller
-    float m_timer = 0.0f;
+    [Tooltip("Horizontal offset of bob")]
+    public float bobOffset = 0.2f;
+
+    [Tooltip("Rotation offset of bob")]
+    public float bobRotation = 70.0f;
+
+    [Tooltip("Smoothness of bob motion")]
+    public float bobSmoothness = 10.0f;
+
+    private Vector3 _originalPosition;
+    private Vector3 _currentBobPosition;
+    private Quaternion _currentBobRotation;
+
+    private float _bobDeltaTime = 0.0f;
 
     private void Start()
     {
-        m_player = FindAnyObjectByType<PlayerControl>();
-
-        m_originalPos = transform.localPosition;
-        m_originalRot = transform.localRotation;
+        _originalPosition = transform.localPosition;
     }
 
     private void Update()
     {
-        ApplyBob();
+        Bob();
     }
 
-    private void ApplyBob()
+    private void Bob()
     {
-        Vector3 moveInput = InputManager.GetMoveInput().normalized;
-        float speedFactor = m_player.currentSpeed / m_player.moveSpeed;
+        Vector3 rawMoveInput = InputManager.GetMoveInput().normalized;
 
-        // Reduce the bob intensity when firing
-        float bobMultiplier = Input.GetMouseButton(0) ? 0.2f : 1.0f;
+        // determine target offset and rotation
+        Vector3 targetPosition = Vector3.zero;
+        Quaternion targetRotation = Quaternion.identity;
 
-        if (moveInput.magnitude > 0)
+        if (rawMoveInput.sqrMagnitude >= 0.001f)
         {
-            // Make the speed of the bob relative to player current speed
-            m_timer += Time.deltaTime * bobSpeed * speedFactor;
+            _bobDeltaTime += Time.deltaTime * bobSpeed;
 
-            // Create vertical and horizontal motion using sin wave
-            float yBob = Mathf.Abs(Mathf.Sin(m_timer)) * bobAmount * bobMultiplier;
-            float xBob = Mathf.Sin(m_timer + Mathf.PI / 2) * bobOffset * bobMultiplier;
+            float yBob = -Mathf.Abs(Mathf.Sin(_bobDeltaTime)) * bobStrength;
+            float xBob = Mathf.Sin(_bobDeltaTime + Mathf.PI / 2) * bobOffset;
 
-            // Apply the calculated bob offset
-            transform.localPosition = new Vector3(
-                m_originalPos.x + xBob, m_originalPos.y + yBob, m_originalPos.z);
-
-            transform.localRotation = Quaternion.Euler(0f, 0f, -xBob * 50.0f);
+            targetPosition = new Vector3(xBob, yBob, 0f);
+            targetRotation = Quaternion.Euler(0f, 0f, -xBob * bobRotation);
         }
-        
-        ResetBob();
-    }
 
-    private void ResetBob()
-    {
-        // Smoothly return back to its original position and rotation
-        transform.localPosition = Vector3.Lerp(
-            transform.localPosition, m_originalPos, Time.deltaTime * smoothness
-        );
+        // smoothly interpolate toward target
+        _currentBobPosition = Vector3.Lerp(_currentBobPosition, targetPosition, Time.deltaTime * bobSmoothness);
+        _currentBobRotation = Quaternion.Lerp(_currentBobRotation, targetRotation, Time.deltaTime * bobSmoothness);
 
-        transform.localRotation = Quaternion.Slerp(
-            transform.localRotation, m_originalRot, Time.deltaTime * smoothness
-        );
+        // apply final transform
+        transform.localPosition = _originalPosition + _currentBobPosition;
+        transform.localRotation =  _currentBobRotation;
     }
 }

@@ -2,18 +2,18 @@ using UnityEngine;
 
 public class Rifle : Weapon
 {
-    [Header("WEAPON")]
-    [SerializeField] Transform firePoint;
+    [Tooltip("Position where the projectile spawns")]
+    public Transform firePoint;
 
     public override void Fire()
     {
-        // Get the projectile from the pool
-        GameObject projectile = PoolManager.instance.GetObject("Projectile");
+        if (!CanFire()) return;
 
-        // Set the position and rotation
+        // get the projectile from the pool and set its transform
+        GameObject projectile = PoolManager.instance.GetObject("Projectile");
         projectile.transform.position = firePoint.position;
         projectile.transform.rotation = firePoint.rotation;
 
-        base.Fire();
+        base.Fire(); // call the base method for firing
     }
 }

@@ -1,62 +1,61 @@
 using UnityEngine;
+
 public class WeaponRecoil : MonoBehaviour
 {
-    [Header("Recoil Settings")]
-    // Rotation offset of the recoil
-    [SerializeField] float recoilRotation = 0.3f;
-    // How strong the recoili is
-    [SerializeField] float recoilKickback = 0.1f;
-    // How fast the recoil is
+    [Tooltip("Rotation offset of the recoil")]
+    public float rotationOffset = 0.3f;
+
+    [Tooltip("How strong the recoil is")]
+    public float recoilStrength = 0.1f;
+
+    [Tooltip("How fast the recoild is")]
     [SerializeField] float recoilSpeed = 5f;
 
-    Quaternion m_originalRot; // Saved the original rotation of this object
-    Vector3 m_originalPos; // Saved the original position of this object
+    private Vector3 _originalPosition;
+    private Vector3 _currentRecoilPosition;
+    private Quaternion _currentRecoilRotation;
+    private Quaternion _originalRotation;
 
-    void Start()
+    private void Start()
     {
-        // Store the original position and rotation of this object
-        m_originalRot = transform.localRotation;
-        m_originalPos = transform.localPosition;
+        // save the initial local transform
+        _originalPosition = transform.localPosition;
+        _originalRotation = transform.localRotation;
     }
 
-    void Update()
+    private void Update()
     {
-        ApplyRecoil();
-        ResetRecoil();
+        Recoil();
     }
-        
-    public void ApplyRecoil()
+
+    private void Recoil()
     {
-        // Only apply recoil when the user fired the weapon
-        if (CanApplyRecoil())
+        // determine target offset and rotation
+        Vector3 targetPosition = Vector3.zero;
+        Quaternion targetRotation = Quaternion.identity;
+
+        if (Input.GetMouseButton(0) && isWeaponFired())
         {
-            // Add random rotation offset on the recoil
-            float randomRecoil = Random.Range(-recoilRotation, recoilRotation);
+            float randomRecoil = Random.Range(-rotationOffset, rotationOffset);
 
-            Quaternion newRotation = Quaternion.Euler(-recoilRotation, randomRecoil, 0);
-            transform.localRotation = transform.localRotation *= newRotation;
-
-            // Move the weapon slightly backward
-            transform.localPosition += Vector3.back * recoilKickback;
+            targetPosition = Vector3.back * recoilStrength;
+            targetRotation = Quaternion.Euler(-randomRecoil, randomRecoil, 0f);
         }
+
+        // smoothly interpolate toward target
+        _currentRecoilPosition = Vector3.Lerp(_currentRecoilPosition, targetPosition, Time.deltaTime * recoilSpeed);
+        _currentRecoilRotation = Quaternion.Slerp(_currentRecoilRotation, targetRotation, Time.deltaTime * recoilSpeed);
+
+        // apply final transform
+        transform.localPosition = _originalPosition + _currentRecoilPosition;
+        transform.localRotation = _originalRotation * _currentRecoilRotation;
     }
 
-    public void ResetRecoil()
+    private bool isWeaponFired()
     {
-        // Smoothly return back to the original position and rotation
-        transform.localRotation = Quaternion.Slerp(
-            transform.localRotation, m_originalRot, Time.deltaTime * recoilSpeed);
+        WeaponManager manager = WeaponManager.instance;
 
-        transform.localPosition = Vector3.Lerp( 
-            transform.localPosition, m_originalPos, Time.deltaTime * recoilSpeed);
-    }
-
-    private bool CanApplyRecoil()
-    {
-        if (Input.GetMouseButton(0) && WeaponManager.instance.ReadyToFire())   
-        {
-            return true;
-        }
-        return false;
+        // return true if theres a valid weapon and i can be fire
+        return manager.currentWeapon != null && manager.currentWeapon.CanFire();
     }
 }

@@ -1,24 +1,24 @@
 using System.Collections.Generic;
-using Unity.Mathematics;
 using UnityEngine;
 
 public class WeaponManager : MonoBehaviour
 {
     public static WeaponManager instance;
 
-    [Header("WEAPONS")]
+    [Tooltip("Holds the current primary weapon")]
     public Weapon primaryWeapon;
-    public Weapon secondaryWeapon;
-    public Weapon meleeWeapon;
 
-    [Header("SLOT")]
+    [Tooltip("Holds the current primary weapon")]
+    public Weapon secondaryWeapon;
+
+    [Tooltip("Holds the current equipped weapon")]
+    public Weapon currentWeapon;
+
+    [Tooltip("Transform where the weapons are place")]
     public Transform weaponSlot;
 
-    private Weapon[] equippedWeapons;
-    private int currentIndex = 0;
-
-    // Current weapon being held by the player
-    [HideInInspector] public Weapon currentWeapon;
+    private Weapon[] _equippedWeapons;
+    private int _currentIndex = 0;
 
     #region Singleton
     private void Awake()
@@ -34,31 +34,24 @@ public class WeaponManager : MonoBehaviour
     }
     #endregion
 
+
     private void Update()
     {
-        FireCurrentWeapon();
-
-        if (Input.mouseScrollDelta.y > 0)
-            SwitchWeapon(1);
-        else if (Input.mouseScrollDelta.y < 0)
-            SwitchWeapon(-1);
+        FireWeapon();
     }
-
     
-    private void FireCurrentWeapon()
+    private void FireWeapon()
     {
-        if (Input.GetMouseButton(0) && ReadyToFire())
+        // only fire when theres valid equipped weapon
+        if (Input.GetMouseButton(0) && currentWeapon != null)
+        {
             currentWeapon.Fire();
-    }
-
-    public bool ReadyToFire()
-    {
-        // Tracks if the user fired the weapon
-        return currentWeapon != null && currentWeapon.CanFire();
+        }
     }
 
     public void SetWeapon(Weapon newWeapon)
     {
+        // store the new weapon based on its category
         switch (newWeapon.category)
         {
             case Weapon.Category.primary:
@@ -67,44 +60,47 @@ public class WeaponManager : MonoBehaviour
             case Weapon.Category.secondary:
                 secondaryWeapon = newWeapon;
                 break;
-            case Weapon.Category.melee:
-                meleeWeapon = newWeapon;
-                break;
         }
 
-        UpdateEquippedWeapons();
-        EquipWeapon(currentIndex); // Re-equip to update current weapon
+        UpdateWeapons();
+        EquipWeapon(_currentIndex); // re-equip after updating weapons
     }
 
-    private void UpdateEquippedWeapons()
+    private void UpdateWeapons()
     {
+        // create a new list of currently equipped weapons
         List<Weapon> list = new List<Weapon>();
 
         if (primaryWeapon != null) list.Add(primaryWeapon);
         if (secondaryWeapon != null) list.Add(secondaryWeapon);
-        if (meleeWeapon != null) list.Add(meleeWeapon);
 
-        equippedWeapons = list.ToArray();
-        currentIndex = Mathf.Clamp(currentIndex, 0, equippedWeapons.Length - 1);
+        // update the array of equipped weapons based on new list of weapons
+        _equippedWeapons = list.ToArray();
+        _currentIndex = Mathf.Clamp(_currentIndex, 0, _equippedWeapons.Length - 1);
     }
 
     private void SwitchWeapon(int direction)
     {
-        if (equippedWeapons.Length == 0) return;
-
-        currentIndex = (currentIndex + direction + equippedWeapons.Length) % equippedWeapons.Length;
-        EquipWeapon(currentIndex);
+        // calculate the next weapon index in a circular manner
+        if (_equippedWeapons.Length != 0)
+        {
+            _currentIndex = (_currentIndex + direction + _equippedWeapons.Length) % _equippedWeapons.Length;
+            EquipWeapon(_currentIndex);
+        }
     }
 
     private void EquipWeapon(int index)
     {
+        // deactivate the currently equipped weapon
         if (currentWeapon != null)
+        {
             currentWeapon.gameObject.SetActive(false);
+        }
 
-        currentWeapon = equippedWeapons[index];
+        // equip the new weapon at the specified index
+        currentWeapon = _equippedWeapons[index];
         currentWeapon.gameObject.SetActive(true);
 
-        currentWeapon.transform.SetParent(weaponSlot);
         currentWeapon.InitializeWeapon();
     }
 }
