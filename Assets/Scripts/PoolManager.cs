@@ -13,11 +13,11 @@ public class PoolManager : MonoBehaviour
         public int size;
     }
 
-    // List of pools you can define in the inspector
+    [Tooltip("List of pools you can define in the inspector")]
     public List<Pool> pools;
 
     // Dictionary to store the pool queues for each object type
-    Dictionary<string, Queue<GameObject>> poolDictionary;
+    private Dictionary<string, Queue<GameObject>> poolDictionary;
 
     #region Singleton
 
@@ -35,7 +35,7 @@ public class PoolManager : MonoBehaviour
     }
     #endregion
 
-    void Start()
+    private void Start()
     {
         // Initialize the dictionary and populate each pool
         poolDictionary = new Dictionary<string, Queue<GameObject>>();

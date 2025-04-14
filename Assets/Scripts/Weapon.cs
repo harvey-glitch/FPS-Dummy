@@ -11,8 +11,19 @@ public abstract class Weapon : MonoBehaviour
     [Tooltip("Holds the weapon statistic")]
     public WeaponData weaponData;
 
-    private int _currentAmmo;
-    private float _lastFireTime;
+    [Tooltip("Reload animation reference to play")]
+    public string reloadClip;
+
+    private Animation _animation;
+
+    private int _currentAmmo = 0;
+    private bool _isReloading = false;
+    private float _lastFireTime = 0.0f;
+
+    private void Start()
+    {
+        _animation = GetComponent<Animation>();
+    }
 
     public void InitializeWeapon()
     {
@@ -38,12 +49,10 @@ public abstract class Weapon : MonoBehaviour
 
     protected IEnumerator StartReload()
     {
-        // track the time elapsed during the reload process
-        float timeElapsed = 0f;
+        _animation.Play(reloadClip);
 
-        while (timeElapsed <= weaponData.reloadSpeed)
+        while (_animation.isPlaying)
         {
-            timeElapsed += Time.deltaTime;
             yield return null;
         }
 

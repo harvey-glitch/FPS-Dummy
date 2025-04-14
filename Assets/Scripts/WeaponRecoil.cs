@@ -5,15 +5,13 @@ public class WeaponRecoil : MonoBehaviour
     [Tooltip("Rotation offset of the recoil")]
     public float rotationOffset = 0.3f;
 
-    [Tooltip("How strong the recoil is")]
-    public float recoilStrength = 0.1f;
-
     [Tooltip("How fast the recoild is")]
     [SerializeField] float recoilSpeed = 5f;
 
     private Vector3 _originalPosition;
-    private Vector3 _currentRecoilPosition;
-    private Quaternion _currentRecoilRotation;
+    private Vector3 _targetPosition;
+    
+    private Quaternion _targetRotation;
     private Quaternion _originalRotation;
 
     private void Start()
@@ -24,38 +22,45 @@ public class WeaponRecoil : MonoBehaviour
     }
 
     private void Update()
-    {
-        Recoil();
+    {     
+        ApplyRecoil();
     }
 
-    private void Recoil()
+    private void ApplyRecoil()
     {
-        // determine target offset and rotation
-        Vector3 targetPosition = Vector3.zero;
-        Quaternion targetRotation = Quaternion.identity;
-
         if (Input.GetMouseButton(0) && isWeaponFired())
         {
-            float randomRecoil = Random.Range(-rotationOffset, rotationOffset);
+            WeaponData weaponData = WeaponManager.instance.currentWeapon.weaponData;
 
-            targetPosition = Vector3.back * recoilStrength;
-            targetRotation = Quaternion.Euler(-randomRecoil, randomRecoil, 0f);
+            // create random horizontal rotation
+            float rotationY = Random.Range(-weaponData.horizontalRecoil, weaponData.horizontalRecoil);
+
+            // make rotation always upward
+            float rotationX = -Mathf.Abs(weaponData.verticalRecoil);
+
+            _targetPosition = Vector3.back * weaponData.recoilKickback;
+            _targetRotation = Quaternion.Euler(rotationX, rotationY, 0f);
+
+            transform.localPosition = _targetPosition;
+            transform.localRotation = _targetRotation;
         }
 
-        // smoothly interpolate toward target
-        _currentRecoilPosition = Vector3.Lerp(_currentRecoilPosition, targetPosition, Time.deltaTime * recoilSpeed);
-        _currentRecoilRotation = Quaternion.Slerp(_currentRecoilRotation, targetRotation, Time.deltaTime * recoilSpeed);
+        else{
+            transform.localPosition = Vector3.Lerp(
+                transform.localPosition, _originalPosition, Time.deltaTime * recoilSpeed
+            );
 
-        // apply final transform
-        transform.localPosition = _originalPosition + _currentRecoilPosition;
-        transform.localRotation = _originalRotation * _currentRecoilRotation;
+            transform.localRotation = Quaternion.Slerp(
+                transform.localRotation, _originalRotation, Time.deltaTime * recoilSpeed
+            );
+        }
     }
 
     private bool isWeaponFired()
     {
         WeaponManager manager = WeaponManager.instance;
 
-        // return true if theres a valid weapon and i can be fire
+        // return true if theres a valid weapon and it can be fire
         return manager.currentWeapon != null && manager.currentWeapon.CanFire();
     }
 }

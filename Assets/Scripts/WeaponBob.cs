@@ -30,10 +30,10 @@ public class WeaponBob : MonoBehaviour
 
     private void Update()
     {
-        Bob();
+        ApplyBob();
     }
 
-    private void Bob()
+    private void ApplyBob()
     {
         Vector3 rawMoveInput = InputManager.GetMoveInput().normalized;
 

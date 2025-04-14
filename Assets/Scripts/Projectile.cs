@@ -14,12 +14,12 @@ public class Projectile : MonoBehaviour
         _projectileTrail = GetComponent<TrailRenderer>();
     }
 
-    void Update()
+    private void Update()
     {
         MoveProjectile();
     }
 
-    void MoveProjectile()
+    private void MoveProjectile()
     {
         // continuesy move the projectile forward
         transform.position += transform.forward * speed * Time.deltaTime;
@@ -33,7 +33,7 @@ public class Projectile : MonoBehaviour
         }
     }
 
-    void ResetProjectleData()
+    private void ResetProjectleData()
     {
         _distanceTraveled = 0;
 
@@ -48,6 +48,7 @@ public class Projectile : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        // avoid colliding with other projectiles
         if (other.transform.CompareTag("Projectiles")) return;
 
         if (other.TryGetComponent<HitBox>(out HitBox hitBox))

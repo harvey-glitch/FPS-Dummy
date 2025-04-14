@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: Shotgun
   m_EditorClassIdentifier: 
   damage: 10
-  firerate: 0.5
+  firerate: 1
   maxAmmo: 6
   reloadSpeed: 3
+  recoilKickback: 0.5
+  horizontalRecoil: 2
+  verticalRecoil: 10
   pellets: 6
   spreadAngle: 7

@@ -2,12 +2,13 @@ using UnityEngine;
 
 public class Shotgun : Weapon
 {
-    [Header("WEAPON")]
-    // Transform where the projectile are shot from
-    [SerializeField] Transform firePoint;
+    [Tooltip("Transform where the projectile spawns")]
+    public Transform firePoint;
 
     public override void Fire()
     {
+        if (!CanFire()) return;
+        
         for (int i = 0; i < weaponData.pellets; i++)
         {
             // Create random direction based on spread value

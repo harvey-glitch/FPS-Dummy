@@ -2,11 +2,13 @@ using UnityEngine;
 
 public class Pistol : Weapon
 {
-    [Header("WEAPON")]
-    [SerializeField] Transform firePoint;
+    [Tooltip("Transform where the projectile spawns")]
+    public Transform firePoint;
 
     public override void Fire()
     {
+        if (!CanFire()) return;
+
         // Get the projectile from the pool
         GameObject projectile = PoolManager.instance.GetObject("Projectile");
 

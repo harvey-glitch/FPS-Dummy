@@ -56,5 +56,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "FPS Dummy.sln"
+    "dotnet.defaultSolution": "FPS-Dummy.sln"
 }

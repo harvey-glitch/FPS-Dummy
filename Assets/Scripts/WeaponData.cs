@@ -16,10 +16,13 @@ public class WeaponData : ScriptableObject
     public float reloadSpeed;
 
     [Tooltip("How strong the weapon kickback when fired")]
-    public float recoilStrength;
+    public float recoilKickback;
 
-    [Tooltip("Rotation offset of the recoil [optional]")]
-    public float recoilOffset;
+    [Tooltip("Determine how strong the horizontal recoil is")]
+    public float horizontalRecoil;
+
+    [Tooltip("Determine how strong the vertical recoil is")]
+    public float verticalRecoil;
 
     [Tooltip("Number of bullet per shot [for shotgun only]")]
     public int pellets;

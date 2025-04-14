@@ -17,7 +17,7 @@ public class WeaponManager : MonoBehaviour
     [Tooltip("Transform where the weapons are place")]
     public Transform weaponSlot;
 
-    private Weapon[] _equippedWeapons;
+    private Dictionary<Weapon.Category, Weapon> _equippedWeapons = new();
     private int _currentIndex = 0;
 
     #region Singleton
@@ -51,56 +51,25 @@ public class WeaponManager : MonoBehaviour
 
     public void SetWeapon(Weapon newWeapon)
     {
-        // store the new weapon based on its category
-        switch (newWeapon.category)
+        // Destroy old weapon if one already exists in the same slot
+        if (_equippedWeapons.ContainsKey(newWeapon.category) && _equippedWeapons[newWeapon.category] != null)
         {
-            case Weapon.Category.primary:
-                primaryWeapon = newWeapon;
-                break;
-            case Weapon.Category.secondary:
-                secondaryWeapon = newWeapon;
-                break;
+            Destroy(_equippedWeapons[newWeapon.category].gameObject);
         }
 
-        UpdateWeapons();
-        EquipWeapon(_currentIndex); // re-equip after updating weapons
+        _equippedWeapons[newWeapon.category] = newWeapon;
+        EquipWeapon(newWeapon.category);
     }
 
-    private void UpdateWeapons()
+    private void EquipWeapon(Weapon.Category category)
     {
-        // create a new list of currently equipped weapons
-        List<Weapon> list = new List<Weapon>();
-
-        if (primaryWeapon != null) list.Add(primaryWeapon);
-        if (secondaryWeapon != null) list.Add(secondaryWeapon);
-
-        // update the array of equipped weapons based on new list of weapons
-        _equippedWeapons = list.ToArray();
-        _currentIndex = Mathf.Clamp(_currentIndex, 0, _equippedWeapons.Length - 1);
-    }
-
-    private void SwitchWeapon(int direction)
-    {
-        // calculate the next weapon index in a circular manner
-        if (_equippedWeapons.Length != 0)
-        {
-            _currentIndex = (_currentIndex + direction + _equippedWeapons.Length) % _equippedWeapons.Length;
-            EquipWeapon(_currentIndex);
-        }
-    }
-
-    private void EquipWeapon(int index)
-    {
-        // deactivate the currently equipped weapon
         if (currentWeapon != null)
         {
             currentWeapon.gameObject.SetActive(false);
         }
 
-        // equip the new weapon at the specified index
-        currentWeapon = _equippedWeapons[index];
+        currentWeapon = _equippedWeapons[category];
         currentWeapon.gameObject.SetActive(true);
-
         currentWeapon.InitializeWeapon();
     }
 }
