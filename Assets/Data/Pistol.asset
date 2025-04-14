@@ -15,7 +15,7 @@ MonoBehaviour:
   damage: 10
   firerate: 0.2
   maxAmmo: 6
-  reloadSpeed: 2
+  reloadSpeed: 5
   recoilKickback: 0.2
   horizontalRecoil: 2
   verticalRecoil: 5

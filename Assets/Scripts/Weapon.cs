@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Animations;
 
 public abstract class Weapon : MonoBehaviour
 {
@@ -12,17 +13,19 @@ public abstract class Weapon : MonoBehaviour
     public WeaponData weaponData;
 
     [Tooltip("Reload animation reference to play")]
-    public string reloadClip;
+    public AnimationClip reloadClip;
 
     private Animation _animation;
 
     private int _currentAmmo = 0;
-    private bool _isReloading = false;
     private float _lastFireTime = 0.0f;
 
     private void Start()
     {
         _animation = GetComponent<Animation>();
+        
+        if (_animation != null)
+        _animation.AddClip(reloadClip, "Reload");
     }
 
     public void InitializeWeapon()
@@ -49,12 +52,14 @@ public abstract class Weapon : MonoBehaviour
 
     protected IEnumerator StartReload()
     {
-        _animation.Play(reloadClip);
+        float reloadTime = weaponData.reloadSpeed;
+        float animationLength = reloadClip.length;
 
-        while (_animation.isPlaying)
-        {
-            yield return null;
-        }
+        float playbackSpeed = animationLength / reloadTime;
+        _animation["Reload"].speed = playbackSpeed;
+        _animation.Play("Reload");
+
+        yield return new WaitForSeconds(reloadTime);
 
         _currentAmmo = weaponData.maxAmmo;
     }

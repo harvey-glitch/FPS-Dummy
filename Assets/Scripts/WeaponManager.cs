@@ -16,7 +16,6 @@ public class WeaponManager : MonoBehaviour
 
     [Tooltip("Transform where the weapons are place")]
     public Transform weaponSlot;
-
     private Dictionary<Weapon.Category, Weapon> _equippedWeapons = new();
     private int _currentIndex = 0;
 

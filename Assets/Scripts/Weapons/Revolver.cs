@@ -1,19 +1,21 @@
 using UnityEngine;
 
-public class Rifle : Weapon
+public class Revolver : Weapon
 {
-    [Tooltip("Position where the projectile spawns")]
+    [Tooltip("Transform where the projectile spawns")]
     public Transform firePoint;
 
     public override void Fire()
     {
         if (!CanFire()) return;
 
-        // get the projectile from the pool and set its transform
+        // Get the projectile from the pool
         GameObject projectile = PoolManager.instance.GetObject("Projectile");
+
+        // Set the position and rotation
         projectile.transform.position = firePoint.position;
         projectile.transform.rotation = firePoint.rotation;
 
-        base.Fire(); // call the base method for firing
+        base.Fire();
     }
 }

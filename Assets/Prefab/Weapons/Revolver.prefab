@@ -170,7 +170,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   category: 1
   weaponData: {fileID: 11400000, guid: 9efa36941b410a94e9f67bf9d2adbf78, type: 2}
-  reloadClip: Revolver Reload
+  reloadClip: {fileID: 7400000, guid: a7b4351df3f83324ead0caf4098bb8c8, type: 2}
   firePoint: {fileID: 4136427953328720725}
 --- !u!111 &-4252847046410865708
 Animation:
@@ -182,8 +182,7 @@ Animation:
   m_Enabled: 1
   serializedVersion: 4
   m_Animation: {fileID: 0}
-  m_Animations:
-  - {fileID: 7400000, guid: a7b4351df3f83324ead0caf4098bb8c8, type: 2}
+  m_Animations: []
   m_WrapMode: 0
   m_PlayAutomatically: 1
   m_AnimatePhysics: 0

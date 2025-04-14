@@ -1627,7 +1627,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5596877457340133582}
   - component: {fileID: 1360133680621443238}
-  - component: {fileID: 7935342727574996303}
+  - component: {fileID: 7347146155729983437}
   m_Layer: 0
   m_Name: Smg
   m_TagString: Untagged
@@ -1670,9 +1670,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   category: 0
   weaponData: {fileID: 11400000, guid: 1a109cde2a2515d46aa5af05f245380c, type: 2}
-  reloadClip: Smg Reload
+  reloadClip: {fileID: 7400000, guid: fa02182b2c84a424da8d34a4e1132c94, type: 2}
   firePoint: {fileID: 379765933420241532}
---- !u!111 &7935342727574996303
+--- !u!111 &7347146155729983437
 Animation:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1681,11 +1681,10 @@ Animation:
   m_GameObject: {fileID: 5882675174258445876}
   m_Enabled: 1
   serializedVersion: 4
-  m_Animation: {fileID: 7400000, guid: fa02182b2c84a424da8d34a4e1132c94, type: 2}
-  m_Animations:
-  - {fileID: 7400000, guid: fa02182b2c84a424da8d34a4e1132c94, type: 2}
+  m_Animation: {fileID: 0}
+  m_Animations: []
   m_WrapMode: 0
-  m_PlayAutomatically: 0
+  m_PlayAutomatically: 1
   m_AnimatePhysics: 0
   m_UpdateMode: 0
   m_CullingType: 0
