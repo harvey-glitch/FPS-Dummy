@@ -1,3 +1,4 @@
+using Unity.Mathematics;
 using UnityEngine;
 
 public class Projectile : MonoBehaviour
@@ -9,21 +10,23 @@ public class Projectile : MonoBehaviour
 
     private float _distanceTraveled;
 
+    private Rigidbody _rigidbody;
+
     private void Start()
     {
         _projectileTrail = GetComponent<TrailRenderer>();
+        _rigidbody = GetComponent<Rigidbody>();
+
+        _rigidbody.freezeRotation = true;
     }
 
     private void Update()
     {
-        MoveProjectile();
+        Disable();
     }
 
-    private void MoveProjectile()
+    private void Disable()
     {
-        // continuesy move the projectile forward
-        transform.position += transform.forward * speed * Time.deltaTime;
-
         _distanceTraveled += speed * Time.deltaTime;
 
         // disable upon reaching specified distance
@@ -31,6 +34,12 @@ public class Projectile : MonoBehaviour
         {
             ReturnToPool();
         }
+    }
+
+    private void FixedUpdate()
+    {
+        // Move the Rigidbody forward along its transform's forward direction
+        _rigidbody.linearVelocity = transform.forward * speed;
     }
 
     private void ResetProjectleData()
@@ -46,27 +55,18 @@ public class Projectile : MonoBehaviour
         ResetProjectleData();
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnCollisionEnter(Collision collision)
     {
-        // avoid colliding with other projectiles
-        if (other.transform.CompareTag("Projectiles")) return;
+        // Handle collision logic here
+        ContactPoint contact = collision.contacts[0];
+        Vector3 hitPoint = contact.point;
+        Vector3 hitRotation = contact.normal;
 
-        if (other.TryGetComponent<HitBox>(out HitBox hitBox))
-        {
-            float damage = WeaponManager.instance.currentWeapon.weaponData.damage;
-            hitBox.ApplyDamage(damage);
-        }
-
-        SpawnParticle();
-    }
-    
-    private void SpawnParticle()
-    {   
-        // get the particle from the pool and set its transform
+        // Get the particle from the pool and set its transform
         GameObject impactParticle = PoolManager.instance.GetObject("Impact");
-        impactParticle.transform.position = transform.position;
-        impactParticle.transform.rotation = Quaternion.identity;
+        impactParticle.transform.position = hitPoint;
+        impactParticle.transform.rotation = Quaternion.LookRotation(hitRotation);
 
-        ReturnToPool(); // return to pool after use
+        ReturnToPool(); // Return to pool after use
     }
 }
