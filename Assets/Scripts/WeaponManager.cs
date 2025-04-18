@@ -21,14 +21,6 @@ public class WeaponManager : MonoBehaviour
 
     private Dictionary<Weapon.Category, Weapon> _equippedWeapons = new();
 
-    private Camera _camera;
-    private float _currentCameraFOV;
-    private float _originalCameraFOV;
-    private float _targetCameraFOV;
-
-    private Vector3 _currentWeaponPosition;
-    private Vector3 _originalWeaponPosition;
-
     #region Singleton
     private void Awake()
     {
@@ -43,19 +35,9 @@ public class WeaponManager : MonoBehaviour
     }
     #endregion
 
-    private void Start()
-    {
-        _originalWeaponPosition = weaponSlot.transform.localPosition;
-
-        _camera = Camera.main;
-        _originalCameraFOV = _camera.fieldOfView;
-        _currentCameraFOV = _originalCameraFOV;
-    }
-
     private void Update()
     {
         WeaponShoot();
-        WeaponAim();
     }
     
     private void WeaponShoot()
@@ -67,29 +49,6 @@ public class WeaponManager : MonoBehaviour
         }
     }
 
-    private void WeaponAim()
-    {
-        // Right mouse button held = aiming
-        bool aiming = Input.GetMouseButton(1);
-
-        // Determine target FOV and weapon position based on aiming state
-        _targetCameraFOV = aiming ? maxAimZoom : _originalCameraFOV;
-        Vector3 targetPosition = aiming ? _originalWeaponPosition + aimOffset : _originalWeaponPosition;
-
-        // Smoothly move weapon to aim position
-        if (Vector3.Distance(_currentWeaponPosition, targetPosition) > 0.01f)
-        {
-            _currentWeaponPosition = Vector3.Lerp(_currentWeaponPosition, targetPosition, Time.deltaTime * 10f);
-            weaponSlot.transform.localPosition = _currentWeaponPosition;
-        }
-
-        // Smoothly zoom the camera (FOV) only if different from target
-        if (!Mathf.Approximately(_currentCameraFOV, _targetCameraFOV))
-        {
-            _currentCameraFOV = Mathf.Lerp(_currentCameraFOV, _targetCameraFOV, Time.deltaTime * 10f);
-            _camera.fieldOfView = _currentCameraFOV;
-        }
-    }
     public void SetWeapon(Weapon newWeapon)
     {
         // Destroy old weapon if one already exists in the same slot

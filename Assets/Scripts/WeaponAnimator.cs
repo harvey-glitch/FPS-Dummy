@@ -17,6 +17,9 @@ public class WeaponAnimator : MonoBehaviour
     [Tooltip("how fast the bounce animation is")]
     public float bounceSpeed;
 
+    [Tooltip("Transform where the weapons are stored")]
+    public Transform weaponSlot;
+
     // original transform
     private Vector3 _originalPosition;
     private Vector3 _originalRotation;
@@ -37,9 +40,16 @@ public class WeaponAnimator : MonoBehaviour
     private Vector3 _currentBouncePosition;
     private Vector3 _targetBouncePosition;
 
-    // Sway
+    // weapon sway
     private Vector3 _currentSwayPosition;
     private Vector3 _targetSwayPosition;
+
+    // weapon aiming
+    private Vector3 _currentAimPosition;
+    private Vector3 _targetAimPosition;
+    private float _currentCameraFov;
+    private float _targetCameraFov;
+    private Camera _camera;
 
     #region Singleton
     private void Awake()
@@ -58,8 +68,11 @@ public class WeaponAnimator : MonoBehaviour
     private void Start()
     {
         // save the original transform
-        _originalPosition = transform.localPosition;
-        _originalRotation = transform.localRotation.eulerAngles;
+        _originalPosition = weaponSlot.localPosition;
+        _originalRotation = weaponSlot.localRotation.eulerAngles;
+
+        _camera = Camera.main;
+        _currentCameraFov = _camera.fieldOfView;
     }
 
     private void Update()
@@ -68,19 +81,20 @@ public class WeaponAnimator : MonoBehaviour
         ApplySwaying();
         ApplyRecoil();
         ApplyBounce();
+        ApplyAiming();
 
-        BlendOffsets();
+        BlendOffsets(); // sum all position and rotation offset then apply to the transform
     }
 
     private void BlendOffsets()
     {
         Vector3 totalPositionOffset = _originalPosition + _currentBobPosition + _currentSwayPosition +
-            _currentRecoilPosition + _currentBouncePosition;
+            _currentRecoilPosition + _currentBouncePosition + _currentAimPosition;
 
         Vector3 totalRotationOffset = _originalRotation + _currentBobRotation + _currentRecoilRotation;
 
-        transform.localPosition = totalPositionOffset;
-        transform.localRotation = Quaternion.Euler(totalRotationOffset);
+        weaponSlot.localPosition = totalPositionOffset;
+        weaponSlot.localRotation = Quaternion.Euler(totalRotationOffset);
     }
 
     private void ApplyBobbing()
@@ -92,6 +106,18 @@ public class WeaponAnimator : MonoBehaviour
     private void ApplySwaying()
     {
         _currentSwayPosition = Vector3.Lerp(_currentSwayPosition, _targetSwayPosition, Time.deltaTime * swaySpeed);
+    }
+
+    private void ApplyAiming()
+    {
+        _currentAimPosition = Vector3.Lerp(_currentAimPosition, _targetAimPosition, Time.deltaTime * 10.0f);
+
+        // adjust camera fov accordingly
+        if (!Mathf.Approximately(_currentCameraFov, _targetCameraFov))
+        {
+            _currentCameraFov = Mathf.Lerp(_currentCameraFov, _targetCameraFov, Time.deltaTime * 10.0f);
+            _camera.fieldOfView = _currentCameraFov;
+        }
     }
 
     private void ApplyRecoil()
@@ -109,15 +135,8 @@ public class WeaponAnimator : MonoBehaviour
     {
         float t = Time.deltaTime * speed;
 
-        if (Vector3.Distance(target, original) > 0.01f)
-        {
-            target = Vector3.Lerp(target, original, t);
-        }
-
-        if (Vector3.Distance(current, target) > 0.01f)
-        {
-            current = Vector3.Lerp(current, target, t);
-        }
+        target = Vector3.Lerp(target, original, t);
+        current = Vector3.Lerp(current, target, t);
     }
 
     public void AddBobbingOffset(Vector3 position, Vector3 rotation)
@@ -142,4 +161,9 @@ public class WeaponAnimator : MonoBehaviour
         _targetBouncePosition += position;
     }
 
+    public void AddAimingOffset(Vector3 position, float newFov)
+    {
+        _targetAimPosition = position;
+        _targetCameraFov = newFov;
+    }
 }

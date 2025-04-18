@@ -17,4 +17,9 @@ public static class InputManager
 
         return new Vector2(mouseX, mouseY);
     }
+
+    public static bool GetAimInput()
+    {
+        return Input.GetMouseButton(1);
+    }
 }

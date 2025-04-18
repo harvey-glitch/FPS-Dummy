@@ -16,8 +16,8 @@ MonoBehaviour:
   firerate: 0.2
   maxAmmo: 6
   reloadSpeed: 5
-  recoilKickback: 0.3
-  horizontalRecoil: 2
-  verticalRecoil: 15
+  recoilKickback: 1
+  horizontalRecoil: 0.5
+  verticalRecoil: 50
   pellets: 0
   spreadAngle: 0
