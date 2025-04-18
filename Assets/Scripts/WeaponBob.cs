@@ -2,44 +2,26 @@ using UnityEngine;
 
 public class WeaponBob : MonoBehaviour
 {
+    [Header("Weapon Bob")]
     [Tooltip("How fast the bob is")]
     public float bobSpeed = 8.0f;
 
     [Tooltip("How strong the bob is")]
-    public float bobStrength = 0.05f;
+    public float bobStrength = 0.1f;
 
     [Tooltip("Horizontal offset of bob")]
-    public float bobOffset = 0.2f;
-
-    [Tooltip("Rotation offset of bob")]
-    public float bobRotation = 70.0f;
-
-    [Tooltip("Smoothness of bob motion")]
-    public float bobSmoothness = 10.0f;
-
-    private Vector3 _originalPosition;
-    private Vector3 _currentBobPosition;
-    private Quaternion _currentBobRotation;
+    public float bobOffset = 0.1f;
 
     private float _bobDeltaTime = 0.0f;
 
-    private void Start()
+    public void Update()
     {
-        _originalPosition = transform.localPosition;
+        CalculateBobOffset();
     }
 
-    private void Update()
-    {
-        ApplyBob();
-    }
-
-    private void ApplyBob()
+    private void CalculateBobOffset()
     {
         Vector3 rawMoveInput = InputManager.GetMoveInput().normalized;
-
-        // determine target offset and rotation
-        Vector3 targetPosition = Vector3.zero;
-        Quaternion targetRotation = Quaternion.identity;
 
         if (rawMoveInput.sqrMagnitude >= 0.001f)
         {
@@ -48,16 +30,9 @@ public class WeaponBob : MonoBehaviour
             float yBob = -Mathf.Abs(Mathf.Sin(_bobDeltaTime)) * bobStrength;
             float xBob = Mathf.Sin(_bobDeltaTime + Mathf.PI / 2) * bobOffset;
 
-            targetPosition = new Vector3(xBob, yBob, 0f);
-            targetRotation = Quaternion.Euler(0f, 0f, -xBob * bobRotation);
+            Vector3 newPosition = new Vector3(xBob, yBob, 0.0f);
+            Vector3 newRotation = new Vector3(0.0f, 0.0f, -xBob * 40.0f);
+            WeaponAnimator.instance.AddBobbingOffset(newPosition, newRotation);
         }
-
-        // smoothly interpolate toward target
-        _currentBobPosition = Vector3.Lerp(_currentBobPosition, targetPosition, Time.deltaTime * bobSmoothness);
-        _currentBobRotation = Quaternion.Lerp(_currentBobRotation, targetRotation, Time.deltaTime * bobSmoothness);
-
-        // apply final transform
-        transform.localPosition = _originalPosition + _currentBobPosition;
-        transform.localRotation =  _currentBobRotation;
     }
 }

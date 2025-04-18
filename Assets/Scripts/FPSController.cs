@@ -1,17 +1,15 @@
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Timeline;
 
 public class FPSController : MonoBehaviour
 {
-    // Movement
+    [Header("Movement")]
     [Tooltip("Speed at which the player moves")]
     public float moveSpeed = 4.0f;
 
     [Tooltip("Speed when sprinting")]
     public float sprintSpeed = 7.0f;
 
-    // Rotation
+    [Header("Rotation")]
     [Tooltip("Max degree the camera can rotate vertically")]
     public float lookLimit = 85.0f;
 
@@ -21,17 +19,14 @@ public class FPSController : MonoBehaviour
     [Tooltip("Smothness of camera rotation")]
     public float lookSmoothness;
 
-    // Jumping
+    [Header("Jumping")]
     [Tooltip("Max height the player can jump")]
     public float jumpHeight;
-
-    [Tooltip("Determine how much gravity should be applied")]
-    public float gravity;
 
     [Tooltip("Determine how strong the gravity would be")]
     public float gravityMultiplier;
 
-    // Ground Check
+    [Header("Ground Check")]
     [Tooltip("Position where the ground check occurs")]
     public Transform spherePosition;
 
@@ -47,8 +42,8 @@ public class FPSController : MonoBehaviour
     [Tooltip("Tracks whether the player is grounded or not")]
     public bool isGrounded;
 
-    private bool wasGrounded = false;
-    public bool justLanded;
+    private bool _wasGrounded = false;
+    [HideInInspector] public bool justLanded;
 
     private CharacterController _characterController;
     private Camera _camera;
@@ -58,6 +53,7 @@ public class FPSController : MonoBehaviour
 
     private float _verticalRotation = 0.0f;
     private Vector3 _verticalVelocity;
+    private Vector3 knockedVelocity;
 
     private void Start()
     {
@@ -76,11 +72,12 @@ public class FPSController : MonoBehaviour
         HandleRotate();
         HandleJump();
 
-        wasGrounded = isGrounded; // update the was grounded state
+        _wasGrounded = isGrounded; // update the was grounded state
     }
 
     private void HandleMove()
     {
+        // determine the current speed based on input
         float currentSpeed = Input.GetKey(KeyCode.LeftShift) ? sprintSpeed : moveSpeed;
 
         Vector3 rawMoveInput = InputManager.GetMoveInput().normalized * currentSpeed;
@@ -121,7 +118,7 @@ public class FPSController : MonoBehaviour
         isGrounded = Physics.CheckSphere(newSpherePosition, sphereRadius, groundLayer);
 
         // check if the character has landed
-        justLanded = !wasGrounded && isGrounded && Mathf.Abs(_verticalVelocity.y) > 0.1f;
+        justLanded = !_wasGrounded && isGrounded && Mathf.Abs(_verticalVelocity.y) > 0.1f;
     }
 
     private void HandleJump()
@@ -135,12 +132,18 @@ public class FPSController : MonoBehaviour
         // calculate the required velocity to jump at specified height
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
-            _verticalVelocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+            _verticalVelocity.y = Mathf.Sqrt(jumpHeight * -2f * -9.81f);
         }
 
-        _verticalVelocity.y += gravity * gravityMultiplier * Time.deltaTime;
+        _verticalVelocity.y += -9.81f * gravityMultiplier * Time.deltaTime;
 
-        _characterController.Move(_verticalVelocity * Time.deltaTime);
+        Vector3 totalVelocity = _verticalVelocity + knockedVelocity;
+        _characterController.Move(totalVelocity * Time.deltaTime);
+    }
+
+    private void ApplyKnockBack(float knockStrength, float offset)
+    {
+        knockedVelocity += -transform.forward * knockStrength + Vector3.up * offset;
     }
 
     private void OnDrawGizmos()
